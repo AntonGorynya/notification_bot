@@ -28,11 +28,16 @@ def send_notification(bot, chat_id, devman_token, long_polling_url=LONG_POLLING_
                 new_attempts = serialized_response['new_attempts']
                 for attempt in new_attempts:
                     if attempt['is_negative']:
-                        text = f"""У вас проверили работу: «{attempt['lesson_title']}»\n
-                               К сожалению, в работе нашлись ошибки»\nСсылка на урок: {attempt['lesson_url']}"""
+                        text = f"""\
+                        У вас проверили работу: «{attempt['lesson_title']}»
+                        К сожалению, в работе нашлись ошибки»
+                        Ссылка на урок: {attempt['lesson_url']}
+                        """
                     else:
-                        text = f"""У вас проверили работу: «{attempt['lesson_title']}»\n
-                               Преподавателю все понравилось, можно приступать к следующему уроку"""
+                        text = f"""\
+                        У вас проверили работу: «{attempt['lesson_title']}»
+                        Преподавателю все понравилось, можно приступать к следующему уроку
+                        """
                     bot.send_message(chat_id=chat_id, text=dedent(text))
         except requests.exceptions.ReadTimeout as error:
             logging.debug(error)
