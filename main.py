@@ -20,12 +20,12 @@ def send_notification(bot, chat_id, devman_token, long_polling_url=LONG_POLLING_
                 params={'timestamp': timestamp}
             )
             response.raise_for_status()
-            serialized_response = response.json()
-            if 'timestamp_to_request' in serialized_response:
-                timestamp = serialized_response['timestamp_to_request']
+            user_reviews = response.json()
+            if 'timestamp_to_request' in user_reviews:
+                timestamp = user_reviews['timestamp_to_request']
             else:
                 timestamp = ''
-                new_attempts = serialized_response['new_attempts']
+                new_attempts = user_reviews['new_attempts']
                 for attempt in new_attempts:
                     if attempt['is_negative']:
                         text = f"""\
