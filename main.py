@@ -8,6 +8,17 @@ import telegram
 
 LONG_POLLING_URL = 'https://dvmn.org/api/long_polling/'
 
+class TelegramLogsHandler(logging.Handler):
+
+    def __init__(self, tg_bot, chat_id):
+        super().__init__()
+        self.chat_id = chat_id
+        self.tg_bot = tg_bot
+
+    def emit(self, record):
+        log_entry = self.format(record)
+        self.tg_bot.send_message(chat_id=self.chat_id, text=log_entry)
+
 
 def send_notification(bot, chat_id, devman_token, long_polling_url=LONG_POLLING_URL):
     timestamp = ''
@@ -40,19 +51,28 @@ def send_notification(bot, chat_id, devman_token, long_polling_url=LONG_POLLING_
                         """
                     bot.send_message(chat_id=chat_id, text=dedent(text))
         except requests.exceptions.ReadTimeout as error:
-            logging.debug(error)
+            logging.error(error)
         except requests.exceptions.ConnectionError as error:
-            logging.debug(error)
+            logging.warning(error)
             print('Trying to reconnect over 30 seconds...')
             time.sleep(30)
+        except Exception as err:
+            logger.error(err)
 
 
 if __name__ == '__main__':
+    logger = logging.getLogger('telegram_logger')
+    logging.basicConfig(level=logging.DEBUG)
+
     env = environs.Env()
     env.read_env()
     chat_id = env('CHAT_ID')
-    telegram_token = env('TG_TOKEN')
+    notification_bot_token = env('TG_TOKEN')
+    log_bot_token = env('TELEGRAM_LOG_BOT_TOKEN')
     devman_token = env('DEV_TOKEN')
-    bot = telegram.Bot(token=telegram_token)
 
-    send_notification(bot, chat_id, devman_token)
+    log_bot = telegram.Bot(token=log_bot_token)
+    logger.addHandler(TelegramLogsHandler(log_bot))
+
+    notification_bot = telegram.Bot(token=notification_bot_token)
+    send_notification(notification_bot, chat_id, devman_token)
