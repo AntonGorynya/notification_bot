@@ -7,6 +7,7 @@ import telegram
 
 
 LONG_POLLING_URL = 'https://dvmn.org/api/long_polling/'
+logger = logging.getLogger('telegram_logger')
 
 
 class TelegramLogsHandler(logging.Handler):
@@ -63,9 +64,6 @@ def send_notification(bot, chat_id, devman_token, long_polling_url=LONG_POLLING_
 
 
 if __name__ == '__main__':
-    logger = logging.getLogger('telegram_logger')
-    logging.basicConfig(level=logging.DEBUG)
-
     env = environs.Env()
     env.read_env()
     chat_id = env('CHAT_ID')
@@ -73,6 +71,7 @@ if __name__ == '__main__':
     log_bot_token = env('TELEGRAM_LOG_BOT_TOKEN')
     devman_token = env('DEV_TOKEN')
 
+    logging.basicConfig(level=logging.DEBUG)
     log_bot = telegram.Bot(token=log_bot_token)
     logger.addHandler(TelegramLogsHandler(log_bot, chat_id))
 
