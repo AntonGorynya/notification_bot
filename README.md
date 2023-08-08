@@ -15,6 +15,7 @@ pip install -r requirements.txt
 DEV_TOKEN='Token хххх'
 TG_TOKEN='хххх:уууу'
 CHAT_ID='ID вашего чата'
+TELEGRAM_LOG_BOT_TOKEN='Токен от лог бота хххх:yyyy'
 ```
 Где `DEV_TOKEN` - токен с сайта  https://dvmn.org, а `TG_TOKEN` - токен телеграм бота.
 
