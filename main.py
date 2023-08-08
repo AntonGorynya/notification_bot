@@ -8,6 +8,7 @@ import telegram
 
 LONG_POLLING_URL = 'https://dvmn.org/api/long_polling/'
 
+
 class TelegramLogsHandler(logging.Handler):
 
     def __init__(self, tg_bot, chat_id):
@@ -53,11 +54,12 @@ def send_notification(bot, chat_id, devman_token, long_polling_url=LONG_POLLING_
         except requests.exceptions.ReadTimeout as error:
             logging.error(error)
         except requests.exceptions.ConnectionError as error:
-            logging.warning(error)
+            logging.error(error)
             print('Trying to reconnect over 30 seconds...')
             time.sleep(30)
         except Exception as err:
-            logger.error(err)
+            logger.exception(err)
+            time.sleep(30)
 
 
 if __name__ == '__main__':
@@ -72,7 +74,7 @@ if __name__ == '__main__':
     devman_token = env('DEV_TOKEN')
 
     log_bot = telegram.Bot(token=log_bot_token)
-    logger.addHandler(TelegramLogsHandler(log_bot))
+    logger.addHandler(TelegramLogsHandler(log_bot, chat_id))
 
     notification_bot = telegram.Bot(token=notification_bot_token)
     send_notification(notification_bot, chat_id, devman_token)
